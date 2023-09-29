@@ -40,20 +40,22 @@ sub crawl {
     $links{$url} = 1;
     
     my $page;
-    while (scalar keys %links) {
+    my $flag = 1;
+    while (scalar keys %links and $flag) {
         my $url = (keys(%links))[0];
         delete $links{$url};
         
         next if $parsed{$url};
         $parsed{$url}++;
         
-        
-        my $resp = $self->{'http'}->get($url);
+        my $resp = $self->{'http'}->request('GET', $url);
+        next if $resp->{'status'} == 404;
         if (!$resp->{'success'}) {
-            croak "WWW::Crawl: HTTP Response " . $resp->{'status'} . " - " . $resp->{'reason'};
+            croak "WWW::Crawl: HTTP Response " . $resp->{'status'} . " - " . $resp->{'reason'} . "\n" . $resp->{'content'};
         }
 
         $page = $resp->{'content'};
+        
         while ($page =~ /href *?= *?("|')(.*?)('|")/gc) {
             my $link = URI->new($2)->abs($uri)->canonical;
             if ($link->scheme   =~ /^http/ and $link->authority eq $uri->authority) {
@@ -85,8 +87,8 @@ sub crawl {
         }
         # Find JS window.open links
         pos($page) = 0;
-        while ($page =~ /(window|document).open\(("|')(.*?)('|")/gc) {
-            my $link = URI->new($2)->abs($uri)->canonical;
+        while ($page =~ /(window|document).open\( *("|')(.*?)('|")/gc) {
+            my $link = URI->new($3)->abs($uri)->canonical;
             if ($link->scheme   =~ /^http/ and $link->authority eq $uri->authority) {
                 my $address     = $link->as_string;
                 while ($address =~ s/(\/|#)$//) {}
@@ -95,8 +97,10 @@ sub crawl {
         }
         
         &$callback($url) if $callback;
+        $flag = 0 if $self->{'nolinks'};
     }
     
+    return keys %links if $self->{'nolinks'};
     return keys %parsed;
 }
 
@@ -147,6 +151,8 @@ C<agent>: The user agent string to use for HTTP requests. Defaults to "Perl-WWW-
 
 C<timestamp>: If a timestamp is added to external JavaScript files to ensure the latest version is loaded by the browser, this option prevents multiple copied of the same file being indexed by ignoring the timestamp query parameter.
 
+C<nolinks>: Don't follow links found in the starting page.  This option is provided for testing and prevents C<WWW::Crawl> following the links it finds.  It also affects the return value of the L<crawl|WWW::Crawl#crawl($url,-[$callback])> method.
+
 =back
 
 =head1 METHODS
@@ -161,7 +167,7 @@ The C<crawl> method will explore the provided URL and its linked resources. It w
 
 In exploring the website, C<crawl> will ignore links to the following types of file C<.pdf>, C<.css>, C<.png>, C<.jpg>, C<.svg> and C<.webmanifest>
 
-Returns an array of URLs that were successfully found during the crawl.
+Returns an array of URLs that were parsed during the crawl. Unless the C<nolinks> option is passed to L<new|WWW::Crawl#new(%options)>, then it returns an array of links found on the itial page.
 
 =head1 AUTHOR
 
@@ -183,6 +189,10 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
+
+=item * GitHub
+
+L<https://github.com/IanBod/WWW-Crawl>
 
 =item * RT: CPAN's request tracker (report bugs here)
 
