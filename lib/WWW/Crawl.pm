@@ -9,7 +9,7 @@ use JSON::PP;
 use Carp qw(croak);
 
 our $VERSION = '0.1';
-$VERSION = eval $VERSION;
+# $VERSION = eval $VERSION;
 
 # TODO:
 # 1  - Use HTML Parser instead of regexps
