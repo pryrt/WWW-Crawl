@@ -167,7 +167,7 @@ The C<crawl> method will explore the provided URL and its linked resources. It w
 
 In exploring the website, C<crawl> will ignore links to the following types of file C<.pdf>, C<.css>, C<.png>, C<.jpg>, C<.svg> and C<.webmanifest>
 
-Returns an array of URLs that were parsed during the crawl. Unless the C<nolinks> option is passed to L<new|WWW::Crawl#new(%options)>, then it returns an array of links found on the itial page.
+Returns an array of URLs that were parsed during the crawl. Unless the C<nolinks> option is passed to L<new|WWW::Crawl#new(%options)>, then it returns an array of links found on the intial page.
 
 =head1 AUTHOR
 
