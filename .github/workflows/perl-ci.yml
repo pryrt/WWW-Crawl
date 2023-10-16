@@ -50,18 +50,24 @@ jobs:
         if: ${{ matrix.perl < '5.14' }}
         run: |
             cpanm --notest ExtUtils::MakeMaker
-      - name: Update HTTP::Tiny to v0.083 or newer
-        if: ${{ matrix.perl < '5.20' }}
+      - name: Linux: Update HTTP::Tiny to v0.083 or newer
+        if: ${{ (matrix.perl < '5.20') && startsWith(matrix.os, 'ubuntu') }}
         run: |
-            echo Dont know why install-deps isnt working below,
-            echo but this should hopefully get the right version installed
             echo BEFORE
-            echo print for UNIVERSAL::VERSION(q(ExtUtils::MakeMaker)), UNIVERSAL::VERSION(q(HTTP::Tiny)) >> getver.pl
-            perl -MExtUtils::MakeMaker -MHTTP::Tiny -l getver.pl
+            perl -MExtUtils::MakeMaker -MHTTP::Tiny -le 'print UNIVERSAL::VERSION($_) for qw/ExtUtils::MakeMaker HTTP::Tiny/'
             echo UPDATE
             cpanm HTTP::Tiny~0.083
             echo AFTER
-            perl -MExtUtils::MakeMaker -MHTTP::Tiny -l getver.pl
+            perl -MExtUtils::MakeMaker -MHTTP::Tiny -le 'print UNIVERSAL::VERSION($_) for qw/ExtUtils::MakeMaker HTTP::Tiny/'
+      - name: Windows: Update HTTP::Tiny to v0.083 or newer
+        if: ${{ (matrix.perl < '5.20') && startsWith(matrix.os, 'windows') }}
+        run: |
+            echo BEFORE
+            perl -MExtUtils::MakeMaker -MHTTP::Tiny -le "print UNIVERSAL::VERSION($_) for qw/ExtUtils::MakeMaker HTTP::Tiny/"
+            echo UPDATE
+            cpanm HTTP::Tiny~0.083
+            echo AFTER
+            perl -MExtUtils::MakeMaker -MHTTP::Tiny -le "print UNIVERSAL::VERSION($_) for qw/ExtUtils::MakeMaker HTTP::Tiny/"
       - name: Run Makefile.PL and get prereqs
         # but there might be some modules needed by configure, which makes chicken/egg problem
         run: |
