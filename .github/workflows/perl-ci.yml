@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os:                 [ 'windows-latest', 'ubuntu-latest' ]
-        perl:               [ '5.12', '5.14', '5.20']
+        perl:               [ '5.14']
         #perl:               [ '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32', '5.34' ]
         #perl:               [ '5.8.5', '5.8.6', '5.8.7', '5.8.8', '5.8.9', '5.10', '5.10.1', '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32' ]
         #perl:               [ '5.12', '5.34' ]
@@ -46,34 +46,15 @@ jobs:
           perl -v
           ${{ ( startsWith(matrix.os, 'windows') && '(get-command cpanm).Path' ) || 'which cpanm' }}
           cpanm --version
-      - name: Pre-Makefile.PL prereqs for older perls
-        if: ${{ matrix.perl < '5.14' }}
+      - name: Grab EUMM and HTTP::Tiny 0.083 or newer _before_ running Makefile.PL for older perls
+        if: ${{ matrix.perl < '5.20' }}
         run: |
             cpanm --notest ExtUtils::MakeMaker
-      - name: Linux - Update HTTP::Tiny to v0.083 or newer
-        if: ${{ (matrix.perl < '5.20') && startsWith(matrix.os, 'ubuntu') }}
-        run: |
-            echo BEFORE
-            perl -MExtUtils::MakeMaker -MHTTP::Tiny -le 'print UNIVERSAL::VERSION($_) for qw/ExtUtils::MakeMaker HTTP::Tiny/'
-            echo UPDATE
             cpanm HTTP::Tiny~0.083
-            echo AFTER
-            perl -MExtUtils::MakeMaker -MHTTP::Tiny -le 'print UNIVERSAL::VERSION($_) for qw/ExtUtils::MakeMaker HTTP::Tiny/'
-      - name: Windows - Update HTTP::Tiny to v0.083 or newer
-        if: ${{ (matrix.perl < '5.20') && startsWith(matrix.os, 'windows') }}
-        run: |
-            echo BEFORE
-            perl -MExtUtils::MakeMaker -MHTTP::Tiny -le "print UNIVERSAL::VERSION($_) for qw/ExtUtils::MakeMaker HTTP::Tiny/"
-            echo UPDATE
-            cpanm HTTP::Tiny~0.083
-            echo AFTER
-            perl -MExtUtils::MakeMaker -MHTTP::Tiny -le "print UNIVERSAL::VERSION($_) for qw/ExtUtils::MakeMaker HTTP::Tiny/"
       - name: Run Makefile.PL and get prereqs
         # but there might be some modules needed by configure, which makes chicken/egg problem
         run: |
           perl -MExtUtils::MakeMaker -le "print 
-          # ${{ ( startsWith(matrix.os, 'windows') && 'Get-ChildItem -Recurse') || 'ls -latrR' }}
-          # install those dependencies
           cpanm --installdeps .
       - name: cpanm test-only
         run: |
