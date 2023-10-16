@@ -6,7 +6,7 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches: '*'
   pull_request:
     branches: [ "main" ]
 
@@ -22,8 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os:                 [ 'windows-latest', 'ubuntu-latest' ]
-        perl:               [ '5.14']
-        #perl:               [ '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32', '5.34' ]
+        perl:               [ '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32', '5.34', '5.38' ]
         #perl:               [ '5.8.5', '5.8.6', '5.8.7', '5.8.8', '5.8.9', '5.10', '5.10.1', '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32' ]
         #perl:               [ '5.12', '5.34' ]
         #perl:               [ '5.32' ]
