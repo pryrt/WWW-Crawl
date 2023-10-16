@@ -54,7 +54,6 @@ jobs:
       - name: Run Makefile.PL and get prereqs
         # but there might be some modules needed by configure, which makes chicken/egg problem
         run: |
-          perl -MExtUtils::MakeMaker -le "print 
           cpanm --installdeps .
       - name: cpanm test-only
         run: |
