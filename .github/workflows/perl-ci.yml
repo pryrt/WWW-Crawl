@@ -50,7 +50,7 @@ jobs:
         if: ${{ matrix.perl < '5.14' }}
         run: |
             cpanm --notest ExtUtils::MakeMaker
-      - name: Linux: Update HTTP::Tiny to v0.083 or newer
+      - name: Linux - Update HTTP::Tiny to v0.083 or newer
         if: ${{ (matrix.perl < '5.20') && startsWith(matrix.os, 'ubuntu') }}
         run: |
             echo BEFORE
@@ -59,7 +59,7 @@ jobs:
             cpanm HTTP::Tiny~0.083
             echo AFTER
             perl -MExtUtils::MakeMaker -MHTTP::Tiny -le 'print UNIVERSAL::VERSION($_) for qw/ExtUtils::MakeMaker HTTP::Tiny/'
-      - name: Windows: Update HTTP::Tiny to v0.083 or newer
+      - name: Windows - Update HTTP::Tiny to v0.083 or newer
         if: ${{ (matrix.perl < '5.20') && startsWith(matrix.os, 'windows') }}
         run: |
             echo BEFORE
