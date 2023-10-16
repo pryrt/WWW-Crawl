@@ -52,7 +52,7 @@ jobs:
       - name: Update HTTP::Tiny to v0.083 or newer
         if: ${{ matrix.perl < '5.20' }}
         run: |
-            echo Dont know why install-deps isn't working below,
+            echo Dont know why install-deps isnt working below,
             echo but this should hopefully get the right version installed
             echo BEFORE
             perl -MExtUtils::MakeMaker -MHTTP::Tiny -le "print for ExtUtils::MakeMaker->VERSION, HTTP::Tiny->VERSION"
