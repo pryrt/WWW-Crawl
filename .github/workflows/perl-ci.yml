@@ -49,9 +49,21 @@ jobs:
         if: ${{ matrix.perl < '5.14' }}
         run: |
             cpanm --notest ExtUtils::MakeMaker
+      - name: Update HTTP::Tiny to v0.083 or newer
+        if: ${{ matrix.perl < '5.20' }}
+        run: |
+            echo Dont know why install-deps isn't working below,
+            echo but this should hopefully get the right version installed
+            echo BEFORE
+            perl -MExtUtils::MakeMaker -MHTTP::Tiny -le "print for ExtUtils::MakeMaker->VERSION, HTTP::Tiny->VERSION"
+            echo UPDATE
+            cpanm HTTP::Tiny~0.083
+            echo AFTER
+            perl -MExtUtils::MakeMaker -MHTTP::Tiny -le "print for ExtUtils::MakeMaker->VERSION, HTTP::Tiny->VERSION"
       - name: Run Makefile.PL and get prereqs
         # but there might be some modules needed by configure, which makes chicken/egg problem
         run: |
+          perl -MExtUtils::MakeMaker -le "print 
           # ${{ ( startsWith(matrix.os, 'windows') && 'Get-ChildItem -Recurse') || 'ls -latrR' }}
           # install those dependencies
           cpanm --installdeps .
